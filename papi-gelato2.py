@@ -1,46 +1,236 @@
-# Nieuwe versie van papi gelato (Matthijs Raatgever)
+import tkinter as tk
+from tkinter import ttk
+from tkinter.messagebox import showerror
 
+window = tk.Tk()
+window.geometry("300x300")
+window.title("Papi Gelato (GUI Update)")
+window.eval('tk::PlaceWindow . center') # optioneel (puur om het scherm in het midden te krijgen)
 
-# Het gaat goed met Papi Gelato en ze gaan het assortiment uitbreiden. Hiervoor moeten wel wat aanpassingen gedaan worden aan het programmaatje dat je hebt geschreven.
-# Ze gaan toppings verkopen, na dat de verkoper weet of hij/zij een hoorntje of bakje moet gebruiken wordt de vraag gesteld: “Wat voor topping wilt u: A) Geen, B) Slagroom, C) Sprinkels of D) Caramel Saus?”.
-
-# Iedere topping heeft zo zijn eigen prijs, maar alle toppings staan als 1 regel op het bonnetje.
-# Geen: geen extra kosten
-# Slagroom: €0,50 extra kosten
-# Sprinkels: voor ieder bolletje €0,30 extra kosten
-# Caramel Saus: als de bestelling in een horrentje zit dan €0,60 extra kosten, als het in een bakje zit dan €0,90 extra kosten.
-
-# Het komt er dan zo uit te zien bij het bestellen van een bakje met 4 bolletjes en slagroom + een horrentje met 1 bolletje en saus:
-# Bij een andere keuze dan A, B, C of D krijg je de tekst te zien: “Sorry dat snap ik niet...” en wordt deze stap herhaald
-# Als er geen toppings zijn gekozen komt de regel met toppings niet op het bonnetje.
-
-
-
+Smaken = ["A","C","V"]
+AB = ["A","B"]
+Toppings = ["A","B","C","D"]
+EenTwee = ["1", "2"]
+JaNee = ["Ja","Nee"]
+alBakje = False
+literNum = 1
+bolNum = 1
 alleToppings = 0
-topping = 0
 aantalBolletjes = 0
 aantalHoorntjes = 0
 aantalBakjes = 0
 aantalSlagroom = 0
 aantalSprinkels = 0
 aantalCaramel = 0
+topping = 0
 slagroomPrijs = 0.50
 sprinkelsPrijs = 0.30
 caramelHoorntje = 0.60
 caramelBakje = 0.90
 bolletjePrijs = 0.95
-hoorntjePrijs = 1.25
-bakjePrijs = 0.7
+hoorntjePrijs = 0.70
+bakjePrijs = 0.50
+getallen = list(range(0,1000))
+marktInput = tk.IntVar()
+literInput = tk.IntVar()
+bolInput = tk.IntVar()
+smaakLInput = tk.StringVar()
+smaakBInput = tk.StringVar()
+toppingInput = tk.StringVar()
+houderInput = tk.StringVar()
+nogmaalsInput = tk.StringVar()
+houder = tk.StringVar()
 
-
-# Code
-print("Welkom bij Papi Gelato.\n")
 
 def showError():
-    print('Sorry, dat snap ik niet...')
-
+    showerror("Vul iets in", "Vul een getal hoger dan 0 in!")
+def showErrorS():
+    showerror("Error", "Sorry, dat snap ik niet...")
 def showErrorB():
-    print('Sorry, zulke grote bakken hebben we niet')
+    showerror("Error",'Sorry, zulke grote bakken hebben we niet')
+
+def destroyWidgets():
+    questionInput.destroy()
+    question.destroy()
+    button.destroy()
+
+
+def keuze():
+    welkom.configure(text="Welkom bij Papi Gelato!",font=("Calibri Light", 20))
+    welkom.place(y=5,x=15)
+    question.configure(text="Bent u 1) particulier of 2) zakelijk?",font=("Calibri Light", 13))
+    question.place(y=120,x=30)
+    questionInput.configure(width=10,values=EenTwee,textvariable=marktInput)
+    questionInput.place(y=150,x=105)
+    button.configure(width=11,bd=0.5,text="Volgende",command=keuze)
+    button.place(y=250,x=105)
+    markt = marktInput.get()
+    if markt == 1:
+        particulier()
+    elif markt == 2:
+        zakelijk()
+    elif markt == 0:
+        print("Leeg")
+    else:
+        print("Error")
+        #showError()
+        #keuze()
+
+def zakelijk():
+    questionInput.configure(values=getallen,textvariable=literInput)
+    question.configure(text="Hoeveel liter ijs wilt u? ")
+    question.place(y=120,x=70)
+    button.configure(command=zakelijkLiterCheck)
+
+def zakelijkLiterCheck():
+    liter = literInput.get()
+    if liter >= 1:
+        print("Zakelijke Smaak")
+        zakelijk2()
+    else:
+        showError()
+
+def zakelijk2():
+    global literNum
+    question.configure(text="Welke smaak wilt u voor liter nummer "+ str(literNum) +"?\nA) Aardbei, C) Chocolade of V) Vanille ")
+    questionInput.configure(values=Smaken,textvariable=smaakLInput)
+    button.configure(command=zakelijkSmaakCheck)
+    literNum += 1
+    question.place(y=100,x=10)
+
+def zakelijkSmaakCheck():
+    smaakL = smaakLInput.get()
+    liter = literInput.get()
+    if smaakL == "A" or smaakL == "C" or smaakL == "V":
+        zakelijk2()
+    if literNum == (liter + 1):
+        zakelijkeBon()
+
+def zakelijkeBon():
+    liter = literInput.get()
+    literPrijs = liter * 9.80
+    quotient = literPrijs / 100
+    procent = quotient*6
+    destroyWidgets()
+    bon1 = tk.Label(text="--------------[Papi Gelato]--------------\n",font=("Calibri Light", 12))
+    bon2 = tk.Label(text=(f"Liter         {liter} x € 9.80 = €{round(literPrijs, 3)}"),font=("Calibri Light", 12))
+    bon3 = tk.Label(text='                                     ----- +',font=("Calibri Light", 12))
+    bon4 = tk.Label(text=(f"Totaal                          €{round(literPrijs,3)}"),font=("Calibri Light", 12))
+    bon5 = tk.Label(text=(f"BTW (6%)                     €{round(procent, 2)}"),font=("Calibri Light", 12))
+    bon1.place(y=50,x=35)
+    bon2.place(y=70,x=35)
+    bon3.place(y=90,x=35)
+    bon4.place(y=110,x=35)
+    bon5.place(y=130,x=35)
+
+def particulier():
+    questionInput.configure(values=getallen,textvariable=bolInput)
+    question.configure(text="Hoeveel bolletjes wilt u? ")
+    question.place(y=120,x=60)
+    button.configure(command=particulierBolCheck)
+
+def particulierBolCheck():
+    global aantalBakjes, alBakje, aantalBolletjes
+    bol = bolInput.get()
+    if bol in range(1,4):
+        aantalBolletjes += bol
+        particulier2()
+    elif bol in range(4,8):
+        aantalBakjes += 1
+        aantalBolletjes += bol
+        alBakje = True
+        houder.set("bakje")
+        particulier2()
+    elif bol >= 8:
+        showErrorB()
+    else:
+        showErrorS()
+
+def particulier2():
+    global bolNum
+    question.configure(text="Welke smaak wilt u voor bol nummer "+ str(bolNum) +"?\nA) Aardbei, C) Chocolade of V) Vanille ")
+    questionInput.configure(values=Smaken,textvariable=smaakBInput)
+    button.configure(command=particulierSmaakCheck)
+    bolNum += 1
+    question.place(y=100,x=10)
+
+def particulierSmaakCheck():
+    smaakB = smaakBInput.get()
+    bol = bolInput.get()
+    if smaakB == "A" or smaakB == "C" or smaakB == "V":
+        particulier2()
+    if bolNum == (bol + 2):
+        if alBakje == True:
+            particulier4()
+        else:
+            particulier3()
+
+def particulier3():
+    question.configure(text="Wilt u deze "+ str(bolInput.get()) +" bolletje(s) in \nA) een hoorntje of B) een bakje? ")
+    questionInput.configure(values=AB,textvariable=houderInput)
+    button.configure(command=bakjeOfhoorntje)
+    question.place(y=100,x=35)
+
+def bakjeOfhoorntje():
+    global houder, aantalHoorntjes, aantalBakjes
+    h = houderInput.get()
+    if h == "A":
+        houder.set("hoorntje")
+        aantalHoorntjes += 1
+        particulier4()
+    elif h == "B":
+        houder.set("bakje")
+        aantalBakjes += 1
+        particulier4()
+    else:
+        showErrorS()
+
+def particulier4():
+    question.configure(text="Wat voor topping wilt u: A) Geen, \nB) Slagroom, C) Sprinkels of D) Caramel Saus?",font=("Calibri Light", 11))
+    question.place(y=100,x=20)
+    questionInput.configure(values=Toppings,textvariable=toppingInput)
+    button.configure(command=toppingsCheck)
+
+def toppingsCheck(): # toppings
+    global topping, aantalSlagroom, aantalSprinkels, aantalCaramel
+    top = toppingInput.get()
+    if top == "A":
+        particulier5()
+    elif top == "B":
+        aantalSlagroom += slagroomPrijs
+        topping =+ 1
+        particulier5()
+    elif top == "C":
+        aantalSprinkels += sprinkelsPrijs * aantalBolletjes
+        topping =+ 1
+        particulier5()
+    elif top == "D":
+        if houder.get() == "hoorntje":
+            aantalCaramel += caramelHoorntje
+        if houder.get() == "bakje":
+            aantalCaramel += caramelBakje
+        topping =+ 1
+        particulier5()
+    else:
+        showError()
+
+def particulier5():
+    question.configure(text="Hier is uw "+str(houder.get())+" met "+str(bolInput.get())+" bolletje(s). \nWilt u nog meer bestellen? Y/N ",font=("Calibri Light", 12))
+    question.place(y=100,x=40)
+    questionInput.configure(values=JaNee,textvariable=nogmaalsInput)
+    button.configure(command=nogmaalsCheck)
+
+def nogmaalsCheck():
+    global bolNum
+    nogmaals = nogmaalsInput.get()
+    if nogmaals == "Ja":
+        bolNum = 1
+        keuze()
+    elif nogmaals == "Nee":
+        bon()
+        print("Bedankt en tot ziens!")
+    else:
+        showErrorS()
 
 def bon():
     global alleToppings
@@ -50,106 +240,33 @@ def bon():
     totaalTopping = aantalSlagroom + aantalCaramel + aantalSprinkels
     totaalBedrag = totaalBol + totaalHoorntje + totaalBak + totaalTopping
     alleToppings += topping
-    print('--------------[Papi Gelato]--------------')
-    print()
+    destroyWidgets()
+    bon1 = tk.Label(text="--------------[Papi Gelato]--------------\n",font=("Calibri Light", 12))
+    bon1.place(y=50,x=35)
     if aantalBolletjes >= 1:
-        print('Bolletjes        '+ str(aantalBolletjes) +' x €0.95 = €'+ str(round(totaalBol, 3)))
+        bon2 = tk.Label(text=(f"Bolletje(s)   {aantalBolletjes} x €0.95 = €{round(totaalBol, 2)}"),font=("Calibri Light", 12))
+        bon2.place(y=70,x=35)
     if aantalHoorntjes >= 1:
-        print('Hoorntje         '+ str(aantalHoorntjes) +' x €1,25 = €' + str(round(totaalHoorntje, 3)))
+        bon3 = tk.Label(text=(f"Hoorntje(s)  {aantalHoorntjes} x €0.70 = €{round(totaalHoorntje, 2)}"),font=("Calibri Light", 12))
+        bon3.place(y=90,x=35)
     if aantalBakjes >= 1:
-        print('Bakje            '+ str(aantalBakjes) +' x €0,75 = €'+ str(round(totaalBak, 3)))
+        bon4 = tk.Label(text=(f"Bakje(s)      {aantalBakjes} x €0.50 = €{round(totaalBak, 2)}"),font=("Calibri Light", 12))
+        bon4.place(y=110,x=35)
     if topping >= 1:
-        print('Topping          '+ str(alleToppings) +' x €'+ str(round(totaalTopping, 3)) +' = €'+ str(round(totaalTopping, 3)))
-    print('                             ----- +')
-    print('Totaal:                      €'+ str(round(totaalBedrag, 3)))
+        bon4 = tk.Label(text=(f"Topping(s)   {alleToppings} x €{round(totaalTopping, 2)} = €{round(totaalTopping, 2)}"),font=("Calibri Light", 12))
+        bon4.place(y=130,x=35)
+    bon3 = tk.Label(text='                                     ----- +',font=("Calibri Light", 12))
+    bon3.place(y=150,x=35)
+    bon4 = tk.Label(text=(f"Totaal                          €{round(totaalBedrag, 2)}"),font=("Calibri Light", 12))
+    bon4.place(y=180,x=35)
 
-def start(): #stap 1
-    global aantalBolletjes, bolInput, aantalBakjes, alBakje, houder
-    alBakje = False
-    bolInput = int(input("Hoeveel bolletjes wilt u? "))
-    aantalBolletjes += bolInput
-    if bolInput in range(1,4):
-        smaakKeuze()
-    elif bolInput in range(4,8):
-        print("Dan krijgt u van mij een bakje met ",bolInput," bolletjes")
-        aantalBakjes += 1
-        alBakje = True
-        houder = "bakje"
-        smaakKeuze()
-    elif bolInput > 8:
-        showErrorB()
-        start()
-    else:
-        showError()
-        start()
-
-def smaakKeuze(): # smaken
-    for x in range(bolInput, 0, -1):
-        smaak = input("Welke smaak wilt u voor bolletje nummer " + str(x) + "? A) Aardbei, C) Chocolade, M) Munt of V) Vanille ")
-    if smaak == "A" or smaak == "C" or smaak == "M" or smaak == "V":
-        if alBakje == True:
-            toppings()
-        else:
-            BakjeOfHoorntje()
-    else:
-        showError()
-        smaakKeuze()
-
-def toppings(): # toppings
-    global topping, aantalSlagroom, aantalSprinkels, aantalCaramel
-    print()
-    ToppingVraag = input('Wat voor topping wilt u: A) Geen, B) Slagroom, C) Sprinkels of D) Caramel Saus? ').upper()
-    if ToppingVraag == "A" or ToppingVraag == "Geen":
-        topping = 0
-        opnieuw()
-    elif ToppingVraag == "B" or ToppingVraag == "Slagroom":
-        aantalSlagroom += slagroomPrijs
-        topping =+ 1
-        opnieuw()
-    elif ToppingVraag == "C" or ToppingVraag == "Sprinkels":
-        aantalSprinkels += sprinkelsPrijs * aantalBolletjes
-        topping =+ 1
-        opnieuw()
-    elif ToppingVraag == "D" or ToppingVraag == "Caramel saus" or ToppingVraag == "Caramel":
-        if houder == "A" or houder == "hoorntje":
-            aantalCaramel += caramelHoorntje
-        if houder == "B" or houder == "bakje":
-            aantalCaramel += caramelBakje
-        topping =+ 1
-        opnieuw()
-    else:
-        showError()
-    topping += topping
-    if bolInput >= 4:
-        opnieuw()
-
-def BakjeOfHoorntje(): #stap 2
-    global houder, aantalHoorntjes, aantalBakjes
-    houder = input("Wilt u deze "+ str(bolInput) +" bolletje(s) in A) een hoorntje of B) een bakje? ")
-    if houder == "A" or houder == "hoorntje":
-        houder = "hoorntje"
-        aantalHoorntjes += 1
-        toppings()
-        opnieuw()
-    elif houder == "B" or houder == "bakje":
-        houder = "bakje"
-        aantalBakjes += 1
-        toppings()
-        opnieuw()
-    else:
-        showError()
-        BakjeOfHoorntje()
-
-def opnieuw(): #stap 3
-    nogmaals = input("\nHier is uw "+str(houder)+" met "+str(bolInput)+" bolletje(s). Wilt u nog meer bestellen? Y/N ")
-    if nogmaals == "Y":
-        start()
-    elif nogmaals == "N":
-        bon()
-        print("Bedankt en tot ziens!")
-    else:
-        showError()
-        opnieuw()
-
-
-start()
+welkom = tk.Label(text="Welkom bij Papi Gelato!",font=("Calibri Light", 20))
+welkom.place(y=5,x=15)
+question = tk.Label(text="Bent u 1) particulier of 2) zakelijk?",font=("Calibri Light", 13))
+question.place(y=120,x=30)
+questionInput = ttk.Combobox(width=10,values=EenTwee,textvariable=marktInput)
+questionInput.place(y=150,x=105)
+button = tk.Button(width=11,bd=0.5,text="Volgende",command=keuze)
+button.place(y=250,x=105)
+#particulier4()
+window.mainloop()
