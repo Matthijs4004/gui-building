@@ -11,9 +11,15 @@ window.eval('tk::PlaceWindow . center') # optioneel (puur om het scherm in het m
 
 bijlInput = tk.StringVar()
 slaapplekInput = tk.StringVar()
-omhakkenInput = tk.StringVar()
+omhakkenInput = tk.IntVar()
+bosvliegtuigInput = tk.StringVar()
+grotInput = tk.StringVar()
+slaapplekInput2 = tk.StringVar()
+huisInput = tk.StringVar()
 getallen = list(range(1,100))
 jaNee = ["Ja","Nee"]
+bosVliegtuig = ["Bos", "Vliegtuig"]
+
 verhaaltje1 = """Je hebt net een heftige noodlanding gemaakt omdat een van de motoren van het vliegtuig kapot is gegaan.
 Je wordt wakker zonder enig idee waar je bent in het wrak van het neergestortte vliegtuig.
 Je loopt naar de opengebarstte achterkant van het vliegtuig en ziet een bijl op de grond liggen.
@@ -21,19 +27,18 @@ Je loopt naar de opengebarstte achterkant van het vliegtuig en ziet een bijl op 
 verhaaltje2 = """Vervolgens ga je vanaf het vliegtuig het bos in.
 Je hebt nog nergens om de nacht door te brengen dus,
 """
-
+def incorrect(text):
+    messagebox.showinfo("Incorrect",text)
 def gameover(text):
     messagebox.showinfo("Gameover",text)
     window.destroy()
-
 def volgende():
-    messagebox.showinfo("", "Uitstekende keuze!")
+    messagebox.showinfo("Correct", "Uitstekende keuze!")
 
-def LevelEen():
+def LevelEenCheck():
     global bijlInput
     antwoord = bijlInput.get()
     if antwoord == "Ja":
-        print("Goede keuze!")
         volgende()
         LevelTwee_1()
     elif antwoord == "Nee":
@@ -47,18 +52,40 @@ def LevelTwee_1():
     vraag.place(x=150)
     antwoordV.configure(textvariable=slaapplekInput)
     button.configure(command=LevelTweeCheck_1)
-
 def LevelTwee_2():
     verhaal.configure(text="Je hebt 10 planken nodig voor een slaapplek, 1 boom = 5 planken.")
+    verhaal.place(x=130)
     vraag.configure(text="Hoeveel bomen ga je omhakken voor je slaapplek?")
     antwoordV.configure(textvariable=omhakkenInput,values=getallen)
     button.configure(command=LevelTweeCheck_2)
-
 def LevelTwee_3():
-    verhaal.configure(text="Je hebt 10 planken nodig voor een slaapplek, 1 boom = 5 planken.")
-    vraag.configure(text="Hoeveel bomen ga je omhakken voor je slaapplek?")
-    antwoordV.configure(textvariable=omhakkenInput,values=getallen)
-    button.configure(command=LevelTweeCheck_2)
+    verhaal.configure(text="Nadat je de hut af had ben je gaan slapen en is het nu dus de volgende ochtend.")
+    verhaal.place(x=90)
+    vraag.configure(text="Ga je dieper het bos is of ga je naar het vliegtuig om spullen te verzamelen?")
+    vraag.place(x=70)
+    antwoordV.configure(textvariable=bosvliegtuigInput,values=bosVliegtuig)
+    button.configure(command=LevelTweeCheck_3)
+def LevelTwee_4():
+    verhaal.configure(text="Je gaat dieper het bos in en komt een grot tegen.")
+    verhaal.place(x=160)
+    vraag.configure(text="Ga je de grot in?")
+    vraag.place(x=270)
+    antwoordV.configure(textvariable=grotInput,values=jaNee)
+    button.configure(command=LevelTweeCheck_4)
+def LevelTwee_5():
+    verhaal.configure(text="Het wordt nacht.")
+    verhaal.place(x=265)
+    vraag.configure(text="Ga je terug naar je slaapplek?")
+    vraag.place(x=230)
+    antwoordV.configure(textvariable=slaapplekInput2,values=jaNee)
+    button.configure(command=LevelTweeCheck_5)
+def LevelTwee_6():
+    verhaal.configure(text="Je gaat verder het bos in en vindt een verlaten huis.")
+    verhaal.place(x=160)
+    vraag.configure(text="Ga je het huis in?")
+    vraag.place(x=250)
+    antwoordV.configure(textvariable=huisInput,values=jaNee)
+    button.configure(command=LevelTweeCheck_5)
 
 def LevelTweeCheck_1():
     antwoord = slaapplekInput.get()
@@ -68,23 +95,42 @@ def LevelTweeCheck_1():
     else:
         gameover("Je faalt om jezelf in de nacht te beschermen tegen de monsters op het eiland.")
 def LevelTweeCheck_2():
-    antwoord1 = omhakkenInput.get()
-    if antwoord1 >= 2:
-        print("Goede keuze!")
-        print()
-        print("Nadat je de hut af had ben je gaan slapen en is het nu dus de volgende ochtend.")
-        print("Je moet een keuze maken, ga je dieper het bos is of ga je naar het vliegtuig om spullen te verzamelen?")
-        print("- Bos")
-        print("- Vliegtuig")
-        #bos_level2()
+    antwoord = omhakkenInput.get()
+    if antwoord >= 2:
+        volgende()
+        LevelTwee_3()
     else:
         gameover("Je faalt om jezelf in de nacht te beschermen tegen de monsters op het eiland.")
-
-
-
-
-
-
+def LevelTweeCheck_3():
+    antwoord = bosvliegtuigInput.get()
+    if antwoord== "Bos":
+        volgende()
+        LevelTwee_4()
+    elif antwoord == "Vliegtuig":
+        gameover("Je komt aan bij het vliegtuig en er springt ineens een monster op je vanuit de cockpit.")
+    else:
+        incorrect("Incorrecte keuze, gebruik de woorden 'bos' of 'vliegtuig'.")
+def LevelTweeCheck_4():
+    antwoord = grotInput.get()
+    if antwoord == "Nee":
+        volgende()
+        LevelTwee_5()
+    else:
+        gameover("Je bent de grot van een beer in gegaan en wordt vermoord.")
+def LevelTweeCheck_5():
+    antwoord = slaapplekInput2.get()
+    if antwoord == "Nee":
+        volgende()
+        LevelTwee_6()
+    else:
+        gameover("Op de weg terug naar je slaapplek wordt je overvallen door een monster op het eiland.")
+def LevelTweeCheck_6():
+    antwoord = input("> ")
+    if antwoord == "Ja":
+        volgende()
+        #huis_level()
+    else:
+        gameover("Het is nog nacht en dus komt er een monster uit de bosjes tevoorschijn die jouw vermoord.")
 
 
 level = tk.Label(text="Level 1 - Vliegtuig",font=("Calibri Light", 11, font.BOLD))
@@ -95,7 +141,7 @@ vraag = tk.Label(text="Neem je de bijl mee?", font=("Calibri Light", 12))
 vraag.place(y=120,x=250)
 antwoordV = ttk.Combobox(width=10,values=jaNee,textvariable=bijlInput, font=("Calibri Light", 12))
 antwoordV.place(y=150,x=270)
-button = tk.Button(width=10,text="Volgende",bd=0.5,command=LevelEen)
+button = tk.Button(width=10,text="Volgende",bd=0.5,command=LevelEenCheck)
 button.place(y=200,x=280)
 
 window.mainloop()
